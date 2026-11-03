@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>高爾夫賣店阿姨</title>
+	<!-- 1. 引入 LINE LIFF SDK -->
+	<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+	<style>
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background: #f8f9fa; }
+		.card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
+		.avatar { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; }
+		.btn { background: #07c160; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 16px; cursor: pointer; }
+		#loading { text-align: center; padding: 40px; }
+	</style>
+</head>
+<body>
+
+	<div id="loading">載入中...</div>
+
+	<div id="app" class="card" style="display: none;">
+		<img id="user-avatar" class="avatar" src="" alt="頭像">
+		<h2 id="user-name">歡迎使用</h2>
+		<p id="user-id" style="font-size: 12px; color: #888;"></p>
+		<button class="btn" onclick="liff.closeWindow()">關閉頁面</button>
+	</div>
+
+	<script>
+		// ⚠️ 請填入 LINE Developers 產生的完整 LIFF ID (包含後面的隨機字串，例如 2012336449-abcdefgh)
+		const MY_LIFF_ID = "2012336449-YOUR_LIFF_KEY";
+
+		async function main() {
+			try {
+				// 2. 初始化 LIFF SDK
+				await liff.init({ liffId: MY_LIFF_ID });
+
+				document.getElementById('loading').style.display = 'none';
+
+				// 3. 判斷是否已登入
+				if (!liff.isLoggedIn()) {
+					// 若在外部瀏覽器開啟，觸發 LINE 登入流程
+					liff.login();
+				} else {
+					// 4. 已登入，取得用戶 Profiles
+					const profile = await liff.getProfile();
+          
+					document.getElementById('app').style.display = 'block';
+					document.getElementById('user-avatar').src = profile.pictureUrl || 'https://via.placeholder.com/80';
+					document.getElementById('user-name').innerText = `你好，${profile.displayName}`;
+					document.getElementById('user-id').innerText = `LINE ID: ${profile.userId}`;
+          
+					console.log("用戶 Profile 取得成功：", profile);
+				}
+			} catch (error) {
+				console.error("LIFF 初始化失敗：", error);
+				document.getElementById('loading').innerText = "載入失敗，請從 LINE 開啟。";
+			}
+		}
+
+		main();
+	</script>
+</body>
+</html>
